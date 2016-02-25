@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<title>Geolocalización</title>
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
+<script type="text/javascript" src="zepto.min.js"></script>
+<link rel="stylesheet" type="text/css" href="Mycss.css" />
+<script type="text/javascript" src="gmaps.js"></script>  
+<script type="text/javascript">
+
+var map, distancia, lat, lng, lat_iniciar, lng_iniciar;
+
+$(function(){
+	map = new GMaps({
+     el: '#map',
+     lat: 0.040,
+     lng: 10.029
+      
+ });
+    map.addMarker({
+     lat: 0.040,
+     lng: 10.029,
+     title: 'Camino ejemplo',        
+     click: function(e){
+       if(console.log)
+         console.log(e);
+         alert('You clicked in this marker');},
+     mouseover: function(e){
+       if(console.log)
+        console.log(e);}
+      });
+
+  
+
+//codigo moodle geolocalicación
+
+  function geolocalizar(){
+   GMaps.geolocate({
+	 success: function(position){		
+		 lat = position.coords.latitude;
+		 lng = position.coords.longitude;
+		 lat_iniciar = position.coords.latitude;
+		 lng_iniciar = position.coords.longitude;
+								
+		 map = new GMaps({
+		   el: '#map',
+		   lat: lat,
+		   lng: lng,
+		   click: enlazarMarcador, //eventos click y tap sobre el mapa
+		   tap: enlazarMarcador
+		 });
+		 map.addMarker({ lat: lat, lng:lng});
+       },
+		error: function(error) {alert('Error:' + error.message);},
+		not_supported: function(){alert("No soporta geolocalización");},
+		always: function(){
+		alert("Se ha identificado su localización");
+		},
+		});
+		};
+		geolocalizar();
+
+function enlazarMarcador(e){
+              //muestra ruta entre marcas anteriores
+  map.drawRoute({
+        origin: [lat, lng], //origen en coordenadas anteriores
+        //destino en coordenadas del click o toque actual
+        destination: [e.latLng.lat(), e.latLng.lng()],
+        travelMode: 'driving',
+        strokeColor: '#086A87',
+        strokeOpacity: 0.6,
+        strokeWeight: 5
+      });
+              
+        lat= e.latLng.lat(); //guarda coords para marca siguiente
+        lng= e.latLng.lng();
+        destinoLat=lat;
+        destinoLng=lng;
+
+        map.addMarker({ lat: lat, lng: lng}); //pone marcador en el mapa
+
+  function limpiar(){
+   posicion
+ 	lat = inicioLat;
+	lng = inicioLng;
+    map = new GMaps({
+     el: '#map',
+	 lat: lat,
+	 lng: lng,
+	 click: enlazarMarcador,
+	 tap: enlazarMarcador
+  });
+   map.addMarker({ lat: lat, lng:lng});
+   map.drawRoute({
+     origin: [lat, lng],
+     destination: [destinoLat, destinoLng],
+     travelMode: 'driving',
+     strokeColor: '#086A87',
+     strokeOpacity: 0.5,
+     strokeWeight: 6
+     });
+ 	lat= destinoLat;
+ 	lng= destinoLng;
+ 	map.addMarker({ lat: lat, lng: lng});
+    }       				
+};
+
+$("#compactar").on('click', limpiar);	
+});
+</script>
+
+</head><body>
+<h1><center>Geolocalización</center></h1>
+<div id="map"></div>
+
+<center>  
+  <button type="button" id="compactar"> Compactar </button>
+</center>
+
+</body></html>
